@@ -82,7 +82,8 @@ class MontecarloRunner(HDFWriterMixin):
 
         Parameters
         ----------
-        model : Radial1DModel
+        tau_sobolev_shape : tuple
+            tuple for the tau_sobolev_shape
         """
 
         # Estimators
