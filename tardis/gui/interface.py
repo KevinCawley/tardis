@@ -28,15 +28,20 @@ from tardis import run_tardis
 def show(model):
     """Take an instance of tardis model and display it.
 
-    If IPython functions were successfully imported then QApplication instance 
-    is created using get_app_qt4. This will only create the app instance if 
-    it doesn't already exists. Otherwise it is explicitly started. 
+    If IPython functions were successfully imported then QApplication instance
+    is created using get_app_qt4. This will only create the app instance if
+    it doesn't already exists. Otherwise it is explicitly started.
 
-    Then the mainwindow is created, the model is attached to it and its 
+    Then the mainwindow is created, the model is attached to it and its
     show method is called.
 
     Finally the eventloop is started using IPython functions (which start them
+<<<<<<< HEAD
+    consistently) if they were imported. Otherwise it is started explicitly.
+
+=======
     consistently) if they were imported. Otherwise it is started explicitly. 
+>>>>>>> 56c506760fd38eb20d9ab479bf71e38c7ee4c43a
     """
     if importFailed:
         app = QtWidgets.QApplication([])
