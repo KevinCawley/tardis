@@ -4,7 +4,7 @@ Procedure to update the reference data
 
 We assume that you have added the necessary changes to TARDIS and have an open pull request.
 
-#. Fork the ``tardis-refdata`` repository as described in :ref:`development-workflow`.
+#. Fork the ``tardis-refdata`` repository following the same steps for farking the main tardis repository described in :ref:`development-workflow`.
 
 #. Clone ``tardis-refdata`` to your computer. Then make a new branch named the same as your new TARDIS feature branch. Make sure to have correctly set up the ``upstream`` remote as explained in :ref:`reviewing-and-helping-with-pr`. 
 
