@@ -54,7 +54,7 @@ Mission Statement
 
 .. toctree::
     :maxdepth: 3
-    :caption: Using TARDIS
+    :title: Using TARDIS
     :hidden:
 
     using/components/index
@@ -65,7 +65,7 @@ Mission Statement
 
 .. toctree::
     :maxdepth: 2
-    :caption: The Physics of TARDIS
+    :title: The Physics of TARDIS
     :hidden:
     
     physics/montecarlo/index
@@ -74,7 +74,7 @@ Mission Statement
 
 .. toctree::
     :maxdepth: 2
-    :caption: Research with TARDIS
+    :title: Research with TARDIS
     :hidden:
 
     Overview <research/index>
@@ -82,7 +82,7 @@ Mission Statement
 
 .. toctree::
     :maxdepth: 2
-    :caption: Team & Credits
+    :title: Team & Credits
     :hidden:
 
     team_and_governance/index
@@ -92,7 +92,7 @@ Mission Statement
 
 .. toctree::
     :maxdepth: 2
-    :caption: Contributing to TARDIS
+    :title: Contributing to TARDIS
     :hidden:
 
     CONTRIBUTING.md
@@ -102,7 +102,7 @@ Mission Statement
 
 .. toctree::
     :maxdepth: 2
-    :caption: API
+    :title: API
     :hidden:
 
     api/modules
