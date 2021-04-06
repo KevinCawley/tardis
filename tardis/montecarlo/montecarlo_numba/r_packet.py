@@ -5,7 +5,7 @@ from numba import njit
 from numba.experimental import jitclass
 
 import math
-from tardis.montecarlo.montecarlo_numba import njit_dict, numba_config
+from tardis.montecarlo.montecarlo_numba import njit_dict, numba_config , njit_dict_no_parallel
 from tardis.montecarlo import (
     montecarlo_configuration as montecarlo_configuration,
 )
@@ -45,6 +45,8 @@ rpacket_spec = [
     ("index", int64),
     ("is_close_line", boolean),
     ("last_interaction_type", int64),
+    ("last_interaction_in_nu", float64),
+    ("last_line_interaction_in_id", int64),
     ("last_line_interaction_out_id", int64),
 ]
 
@@ -62,6 +64,8 @@ class RPacket(object):
         self.index = index
         self.is_close_line = is_close_line
         self.last_interaction_type = -1
+        self.last_interaction_in_nu = 0.0
+        self.last_line_interaction_in_id = -1
         self.last_line_interaction_out_id = -1
 
     def initialize_line_id(self, numba_plasma, numba_model):
@@ -78,21 +82,20 @@ class RPacket(object):
         self.next_line_id = next_line_id
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def calculate_distance_boundary(r, mu, r_inner, r_outer):
     """
     Calculate distance to shell boundary in cm.
 
-    Parameters:
-    ------------
-
-    r: float
+    Parameters
+    ----------
+    r : float
        radial coordinate of the RPacket
-    mu: float
+    mu : float
        cosine of the direction of movement
-    r_inner: float
+    r_inner : float
        inner radius of current shell
-    r_outer: float
+    r_outer : float
        outer radius of current shell
     """
 
@@ -123,27 +126,27 @@ def calculate_distance_boundary(r, mu, r_inner, r_outer):
 
 # @log_decorator
 #'float64(RPacket, float64, int64, float64, float64)'
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def calculate_distance_line(
     r_packet, comov_nu, is_last_line, nu_line, time_explosion
 ):
     """
     Calculate distance until RPacket is in resonance with the next line
+    
     Parameters
     ----------
-    r_packet: RPacket
-    comov_nu: float
+    r_packet : tardis.montecarlo.montecarlo_numba.r_packet.RPacket
+    comov_nu : float
         comoving frequency at the CURRENT position of the RPacket
-    nu_line: float
-        line to check the distance to
-    time_explosion: float
-        time since explosion in seconds
-    is_last_line: bool
+    is_last_line : bool
         return MISS_DISTANCE if at the end of the line list
-
+    nu_line : float
+        line to check the distance to
+    time_explosion : float
+        time since explosion in seconds
+    
     Returns
     -------
-
     """
 
     nu = r_packet.nu
@@ -174,7 +177,7 @@ def calculate_distance_line(
     return distance
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def calculate_distance_line_full_relativity(
     nu_line, nu, time_explosion, r_packet
 ):
@@ -199,33 +202,34 @@ def calculate_distance_line_full_relativity(
     return distance
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def calculate_distance_electron(electron_density, tau_event):
     """
     Calculate distance to Thomson Scattering
 
-    electron_density: float
-    tau_event: float
+    Parameters
+    ----------
+    electron_density : float
+    tau_event : float
     """
     # add full_relativity here
     return tau_event / (electron_density * numba_config.SIGMA_THOMSON)
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def calculate_tau_electron(electron_density, distance):
     """
     Calculate tau for Thomson scattering
 
-    Parameters:
-    ------------
-
-    electron_density: float
-    distance: float
+    Parameters
+    ----------
+    electron_density : float
+    distance : float
     """
     return electron_density * numba_config.SIGMA_THOMSON * distance
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def get_doppler_factor(r, mu, time_explosion):
     inv_c = 1 / C_SPEED_OF_LIGHT
     inv_t = 1 / time_explosion
@@ -236,27 +240,26 @@ def get_doppler_factor(r, mu, time_explosion):
         return get_doppler_factor_full_relativity(mu, beta)
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def get_doppler_factor_partial_relativity(mu, beta):
     return 1.0 - mu * beta
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def get_doppler_factor_full_relativity(mu, beta):
     return (1.0 - mu * beta) / math.sqrt(1 - beta * beta)
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def get_inverse_doppler_factor(r, mu, time_explosion):
     """
     Calculate doppler factor for frame transformation
 
-    Parameters:
-    ------------
-
-    r: float
-    mu: float
-    time_explosion: float
+    Parameters
+    ----------
+    r : float
+    mu : float
+    time_explosion : float
     """
     inv_c = 1 / C_SPEED_OF_LIGHT
     inv_t = 1 / time_explosion
@@ -267,22 +270,22 @@ def get_inverse_doppler_factor(r, mu, time_explosion):
         return get_inverse_doppler_factor_full_relativity(mu, beta)
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def get_inverse_doppler_factor_partial_relativity(mu, beta):
     return 1.0 / (1.0 - mu * beta)
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def get_inverse_doppler_factor_full_relativity(mu, beta):
     return (1.0 + mu * beta) / math.sqrt(1 - beta * beta)
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def get_random_mu():
     return 2.0 * np.random.random() - 1.0
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def update_line_estimators(
     estimators, r_packet, cur_line_id, distance_trace, time_explosion
 ):
@@ -291,12 +294,11 @@ def update_line_estimators(
 
     Parameters
     ----------
-    estimators: Estimators
-    r_packet: RPacket
-    cur_line_id: int
-    distance_trace: float
-    time_explosion: float
-
+    estimators : tardis.montecarlo.montecarlo_numba.numba_interface.Estimators
+    r_packet : tardis.montecarlo.montecarlo_numba.r_packet.RPacket
+    cur_line_id : int
+    distance_trace : float
+    time_explosion : float
     """
 
     """ Actual calculation - simplified below
@@ -320,13 +322,13 @@ def update_line_estimators(
     ] += energy
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def calc_packet_energy_full_relativity(r_packet):
     # accurate to 1 / gamma - according to C. Vogl
     return r_packet.energy
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def calc_packet_energy(r_packet, distance_trace, time_explosion):
     doppler_factor = 1.0 - (
         (distance_trace + r_packet.mu * r_packet.r)
@@ -336,21 +338,20 @@ def calc_packet_energy(r_packet, distance_trace, time_explosion):
     return energy
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def trace_packet(r_packet, numba_model, numba_plasma, estimators):
     """
     Traces the RPacket through the ejecta and stops when an interaction happens (heart of the calculation)
 
-    r_packet: RPacket
     Parameters
     ----------
-    numba_model: tardis.montecarlo.montecarlo_numba.numba_interface.NumbaModel
-    numba_plasma: tardis.montecarlo.montecarlo_numba.numba_interface.NumbaPlasma
-    estimators: tardis.montecarlo.montecarlo_numba.numba_interface.Estimators
+    r_packet : tardis.montecarlo.montecarlo_numba.r_packet.RPacket
+    numba_model : tardis.montecarlo.montecarlo_numba.numba_interface.NumbaModel
+    numba_plasma : tardis.montecarlo.montecarlo_numba.numba_interface.NumbaPlasma
+    estimators : tardis.montecarlo.montecarlo_numba.numba_interface.Estimators
 
     Returns
     -------
-
     """
 
     r_inner = numba_model.r_inner[r_packet.current_shell_id]
@@ -456,6 +457,8 @@ def trace_packet(r_packet, numba_model, numba_plasma, estimators):
             and not montecarlo_configuration.disable_line_scattering
         ):
             interaction_type = InteractionType.LINE  # Line
+            r_packet.last_interaction_in_nu = r_packet.nu
+            r_packet.last_line_interaction_in_id = cur_line_id
             r_packet.next_line_id = cur_line_id
             distance = distance_trace
             break
@@ -487,24 +490,21 @@ def trace_packet(r_packet, numba_model, numba_plasma, estimators):
 
     # r_packet.next_line_id = cur_line_id
 
-    r_packet.last_interaction_type = interaction_type
-
     return distance, interaction_type, delta_shell
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def move_r_packet(r_packet, distance, time_explosion, numba_estimator):
     """
     Move packet a distance and recalculate the new angle mu
 
     Parameters
     ----------
-
-    r_packet: tardis.montecarlo.montecarlo_numba.r_packet.RPacket
+    r_packet : tardis.montecarlo.montecarlo_numba.r_packet.RPacket
         r_packet objects
-    time_explosion: float
+    time_explosion : float
         time since explosion in s
-    numba_estimator: tardis.montecarlo.montecarlo_numba.numba_interface.NumbaEstimator
+    numba_estimator : tardis.montecarlo.montecarlo_numba.numba_interface.NumbaEstimator
         Estimators object
     distance : float
         distance in cm
@@ -540,7 +540,7 @@ def move_r_packet(r_packet, distance, time_explosion, numba_estimator):
             )
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def set_estimators(r_packet, distance, numba_estimator, comov_nu, comov_energy):
     """
     Updating the estimators
@@ -553,7 +553,7 @@ def set_estimators(r_packet, distance, numba_estimator, comov_nu, comov_energy):
     )
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def set_estimators_full_relativity(
     r_packet, distance, numba_estimator, comov_nu, comov_energy, doppler_factor
 ):
@@ -565,7 +565,7 @@ def set_estimators_full_relativity(
     )
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def move_packet_across_shell_boundary(packet, delta_shell, no_of_shells):
     """
     Move packet across shell boundary - realizing if we are still in the simulation or have
@@ -577,10 +577,10 @@ def move_packet_across_shell_boundary(packet, delta_shell, no_of_shells):
     distance : float
         distance to move to shell boundary
 
-    delta_shell: int
+    delta_shell : int
         is +1 if moving outward or -1 if moving inward
 
-    no_of_shells: int
+    no_of_shells : int
         number of shells in TARDIS simulation
     """
     next_shell_id = packet.current_shell_id + delta_shell
@@ -593,7 +593,7 @@ def move_packet_across_shell_boundary(packet, delta_shell, no_of_shells):
         packet.current_shell_id = next_shell_id
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def angle_aberration_CMF_to_LF(r_packet, time_explosion, mu):
     """
     Converts angle aberration from comoving frame to
@@ -604,7 +604,7 @@ def angle_aberration_CMF_to_LF(r_packet, time_explosion, mu):
     return (r_packet.mu + beta) / (1.0 + beta * mu)
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def angle_aberration_LF_to_CMF(r_packet, time_explosion, mu):
     """
 
@@ -617,7 +617,7 @@ def angle_aberration_LF_to_CMF(r_packet, time_explosion, mu):
     return (mu - beta) / (1.0 - beta * mu)
 
 
-@njit(**njit_dict)
+@njit(**njit_dict_no_parallel)
 def test_for_close_line(r_packet, line_id, nu_line, numba_plasma):
     r_packet.is_close_line = abs(
         numba_plasma.line_list_nu[line_id] - nu_line

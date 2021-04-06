@@ -1,3 +1,5 @@
+.. _propagation:
+
 ******************
 Packet Propagation
 ******************
@@ -109,7 +111,18 @@ propagation is stopped and it is no longer considered. Instead, processing the
 next packet of the population is started. Similarly, the propagation is stopped
 if the packet escapes through the outer surface of the domain. However, in this
 case the packet contributes to the final emergent spectrum (see :doc:`Spectrum
-Formation <virtualpackets>`).
+Formation <virtualpackets>`). The following figures summarize the calculations
+of these distances:
+
+The calculations for the distance to the outer boundary:
+
+.. image:: ../../graphics/d_outer.png
+    :width: 400
+
+The calculations for the distance to the inner boundary:
+
+.. image:: ../../graphics/d_inner.png
+    :width: 400
 
 Physical Events
 ===============
@@ -153,8 +166,8 @@ width given by the line profile function (in the case at hand, this width is
 mainly given by thermal broadening) would render the determination of the line
 optical depth accumulated along the photon/packet trajectory a complicated
 task. Fortunately, the typical conditions in supernova ejecta warrant the use
-of the so-called Sobolev approximation (see :doc:`Sobolev Approximation
-<../physics/sobolev>`). Roughly speaking, this approximation replaces the line
+of the so-called Sobolev approximation (see :ref:`Sobolev Approximation
+<tau_sobolev>`). Roughly speaking, this approximation replaces the line
 profile function with a :math:`\delta` distribution around the natural line
 frequency. Thus, photons/packets may only interact with a line transition if
 their co-moving frame frequency exactly equals the natural frequency of the
@@ -217,6 +230,10 @@ relativistic Doppler shift
 Here, the subscripts highlight the packet properties before (:math:`i` for
 initial) and after (:math:`f` for final) the scattering. Also, the common
 parameter of special relativity, :math:`\beta = v / c`, is used.
+
+The ratio :math:`\frac{1 - \beta \mu_i}{1 - \beta \mu_f}` can be visualized with the following graph for a speed of :math:`1.1 \times 10^4` km/s:
+
+.. plot:: physics/pyplot/plot_mu_in_out_packet.py
 
 Line interactions proceed in a similar fashion. Since we assume that the
 re-emission process occurs isotropically as well, the same directional sampling

@@ -60,9 +60,8 @@ class IsotopeAbundances(pd.DataFrame):
 
         Returns
         -------
-            : list
-            list of pyne Materialss
-        :return:
+        list
+            list of pyne Materials
         """
 
         comp_dicts = [dict() for i in range(len(self.columns))]
@@ -85,7 +84,8 @@ class IsotopeAbundances(pd.DataFrame):
 
         Returns
         -------
-            : decayed abundances
+        pandas.DataFrame
+            Decayed abundances
         """
 
         materials = self.to_materials()
@@ -105,7 +105,8 @@ class IsotopeAbundances(pd.DataFrame):
 
         Returns
         -------
-            : merged isotope abundances
+        pandas.DataFrame
+            Merged isotope abundances
         """
 
         return self.groupby("atomic_number").sum()
@@ -116,17 +117,14 @@ class IsotopeAbundances(pd.DataFrame):
 
         Parameters
         ----------
-<<<<<<< HEAD
-        other: pd.DataFrame
-=======
-        other : pd.DataFrame 
->>>>>>> 56c506760fd38eb20d9ab479bf71e38c7ee4c43a
+        other : pd.DataFrame
         normalize : bool
             If true, resultant dataframe will be normalized
 
         Returns
         -------
-            : merged abundances
+        pandas.DataFrame
+            merged abundances
         """
         isotope_abundance = self.as_atoms()
         isotope_abundance = isotope_abundance.fillna(0.0)

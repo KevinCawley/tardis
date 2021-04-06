@@ -8,8 +8,7 @@ Before installing TARDIS, please check its :ref:`requirements
 <requirements_label>`. We provide :ref:`instructions <anaconda_inst_label>` for installing TARDIS using 
 Anaconda. If you encounter problems, consult the
 :ref:`troubleshooting <troubleshooting_inst_label>` section. Once you have
-installed TARDIS, check out :doc:`running` for instructions regarding how to perform
-simple TARDIS calculations.
+installed TARDIS, check out the "Using TARDIS" section (in sidebar) for instructions regarding how to perform simple TARDIS calculations.
 
 .. _requirements_label:
 
@@ -77,30 +76,6 @@ then install TARDIS, as follows::
     git clone https://github.com/tardis-sn/tardis.git
     cd tardis
     python setup.py install
-
-
-.. _install_openmp:
-Enabling parallel execution with OpenMP
----------------------------------------
-
-
-Manually, cloning the repository enables other options such as running the code in parallel (enabling OpenMP).
-In general, we encourage downloading the compilers from `conda` as we then can ensure that they work with TARDIS.
-Within the TARDIS conda environment do::
-
-    conda install -c conda-forge compilers
-
-For macOS::
-
-    conda install -c conda-forge llvm-openmp
-
-For Linux::
-
-    conda install -c conda-forge openmp
-
-To compile TARDIS for parallel execution::
-
-    python setup.py install --with-openmp
 
 
 .. _troubleshooting_inst_label:
